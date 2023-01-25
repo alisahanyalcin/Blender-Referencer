@@ -72,7 +72,7 @@ class Referencer_Panel(bpy.types.Panel):
         row.prop(scn, 'Down')
 
         row = layout.row()
-        row.operator('object.creator', text='Create', icon='IMAGE_PLANE', description='Create Reference Images')
+        row.operator('object.creator', text='Create', icon='IMAGE_PLANE')
         layout.separator()
 
 
