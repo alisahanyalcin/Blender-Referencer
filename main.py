@@ -1,7 +1,7 @@
 bl_info = {
     "name": "Referencer",
     "author": "alisahanyalcin",
-    "version": (1, 0),
+    "version": (1, 1),
     "blender": (3, 4, 1),
     "location": "3D_Viewport window > N-Panel > Referencer",
     "description": "Add reference images to your scene by url",
@@ -17,6 +17,24 @@ from urllib import request
 from urllib.request import Request, urlopen
 import uuid
 import os
+
+
+class Referencer_Preferences(bpy.types.AddonPreferences):
+    bl_idname = __name__
+
+    def draw(self, context):
+        layout = self.layout
+        layout.label(text='Reference Images Download Path:')
+        row = layout.row()
+        home_dir = os.path.expanduser("~")
+        documents_dir = os.path.join(home_dir, "Documents")
+        row.prop(context.scene, 'Path')
+
+        if not os.path.exists(f"{documents_dir}/referencer"):
+            os.makedirs(os.path.join(documents_dir, "referencer"), exist_ok=True)
+
+        row = layout.row()
+        row.label(text=f'by default: {documents_dir}\\referencer')
 
 
 class Referencer_Panel(bpy.types.Panel):
@@ -35,7 +53,7 @@ class Referencer_Panel(bpy.types.Panel):
 
         row.label(text="Reference Image Url")
         row = box.row()
-        row.prop(scn, 'MyString')
+        row.prop(scn, 'Image_Url')
 
         box = layout.box()
         row = box.row()
@@ -53,10 +71,8 @@ class Referencer_Panel(bpy.types.Panel):
         row = box.row()
         row.prop(scn, 'Down')
 
-        layout.operator("idname_must.be_all_lowercase_and_contain_one_dot")
-
         row = layout.row()
-        row.operator('object.creator', text='Create', icon='IMAGE_PLANE')
+        row.operator('object.creator', text='Create', icon='IMAGE_PLANE', description='Create Reference Images')
         layout.separator()
 
 
@@ -66,12 +82,16 @@ class Creator(bpy.types.Operator):
 
     def execute(self, context):
         home_dir = os.path.expanduser("~")
-        documents_dir = os.path.join(home_dir, "Documents")
+
+        if bpy.context.scene.Path != "":
+            documents_dir = bpy.context.scene.Path
+        else:
+            documents_dir = os.path.join(home_dir, "Documents")
 
         if not os.path.exists(f"{documents_dir}/referencer"):
             os.makedirs(os.path.join(documents_dir, "referencer"), exist_ok=True)
         else:
-            url = bpy.context.scene.MyString
+            url = bpy.context.scene.Image_Url
             uid = uuid.uuid1()
             fileExtension = os.path.splitext(f'{url}')[1]
 
@@ -114,20 +134,23 @@ class Creator(bpy.types.Operator):
 
 
 def register():
-    bpy.types.Scene.Front = BoolProperty(name="Front", description="True or False?", default=True)
-    bpy.types.Scene.Back = BoolProperty(name="Back", description="True or False?", default=True)
-    bpy.types.Scene.Left = BoolProperty(name="Left", description="True or False?", default=True)
-    bpy.types.Scene.Right = BoolProperty(name="Right", description="True or False?", default=True)
-    bpy.types.Scene.Up = BoolProperty(name="Up", description="True or False?", default=True)
-    bpy.types.Scene.Down = BoolProperty(name="Down", description="True or False?", default=True)
+    bpy.types.Scene.Front = BoolProperty(name="Front", description="to add Front reference image", default=True)
+    bpy.types.Scene.Back = BoolProperty(name="Back", description="to add Back reference image", default=True)
+    bpy.types.Scene.Left = BoolProperty(name="Left", description="to add Left reference image", default=True)
+    bpy.types.Scene.Right = BoolProperty(name="Right", description="to add Right reference image", default=True)
+    bpy.types.Scene.Up = BoolProperty(name="Up", description="to add Up reference image", default=True)
+    bpy.types.Scene.Down = BoolProperty(name="Down", description="to add Down reference image", default=True)
 
-    bpy.types.Scene.MyString = StringProperty(name="")
+    bpy.types.Scene.Image_Url = StringProperty(name="", description="Reference Image Url")
+    bpy.types.Scene.Path = StringProperty(subtype="FILE_PATH", description="Reference Images Download Path")
 
+    bpy.utils.register_class(Referencer_Preferences)
     bpy.utils.register_class(Referencer_Panel)
     bpy.utils.register_class(Creator)
 
 
 def unregister():
+    bpy.utils.unregister_class(Referencer_Preferences)
     bpy.utils.unregister_class(Referencer_Panel)
     bpy.utils.unregister_class(Creator)
 

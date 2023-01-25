@@ -2,9 +2,9 @@
 Add reference images to your scene by url
 
 ## Installation
-1. Download the latest release from the [releases page](https://github.com/alisahanyalcin/Blender-Referencer/releases)
+1. Download the latest release from the [releases page](https://github.com/alisahanyalcin/Blender-Referencer/releases) and extract the zip file.
 2. Open Blender and go to Edit > Preferences > Add-ons.
-3. Click "Install" and select the downloaded zip file.
+3. Click "Install" and select the zip file you just extracted.
 4. Enable the add-on by checking the box next to it.
 5. Click "Save User Settings" to save the add-on's preferences.
 
